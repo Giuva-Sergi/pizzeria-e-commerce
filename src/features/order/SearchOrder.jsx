@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 function SearchOrder() {
   const [orderNumber, setOrderNumber] = useState("");
   const navigate = useNavigate();
+
   function handleSubmit(e) {
     e.preventDefault();
     if (!orderNumber) return;
