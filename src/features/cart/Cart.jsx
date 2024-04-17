@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
 import LinkButton from "../ui/LinkButton";
 import Button from "../ui/Button";
 import CartItem from "./CartItem";
-import { useSelector } from "react-redux";
+import EmptyCart from "./EmptyCart";
+import { useDispatch, useSelector } from "react-redux";
+import { getCart } from "./cartSlice";
+import { getUsername } from "../user/userSlice";
+import { clearCart } from "./cartSlice";
 
 const fakeCart = [
   {
@@ -29,9 +32,15 @@ const fakeCart = [
 ];
 
 function Cart() {
-  const cart = useSelector(state => state.cart.cart);
-  const username = useSelector(state => state.user.username)
-  console.log(cart);
+  const cart = useSelector(getCart);
+  const username = useSelector(getUsername);
+  const dispatch = useDispatch();
+
+  function handleClearCart() {
+    dispatch(clearCart())
+  }
+
+  if (cart.length === 0) return <EmptyCart />; 
 
   return (
     <div className="px-4 py-3">
@@ -45,7 +54,7 @@ function Cart() {
 
       <div className="mt-6 space-x-2">
         <Button to="/order/new" type="primary">Order pizzas</Button>
-        <Button type="secondary">Clear cart</Button>
+        <Button type="secondary" handler={handleClearCart}>Clear cart</Button>
       </div>
     </div>
   );
