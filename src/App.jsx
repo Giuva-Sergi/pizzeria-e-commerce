@@ -6,8 +6,10 @@ import Order, { loader as orderLoader } from "./features/order/Order";
 import CreateOrder, {
   action as createOrderAction,
 } from "./features/order/CreateOrder";
+import {action as updateOrderAction} from "./features/order/UpdateOrder";
 import AppLayout from "./features/ui/AppLayout";
 import Error from "./features/ui/Error";
+import PrivateRoute from "./features/ui/PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -20,27 +22,38 @@ const router = createBrowserRouter([
       },
       {
         path: "/menu",
-        element: <Menu />,
+        element: <PrivateRoute>
+                    <Menu />
+                 </PrivateRoute>,
         errorElement: <Error />,
         loader: menuLoader,
       },
       {
         path: "/cart",
-        element: <Cart />,
+        element: <PrivateRoute>
+                  <Cart />
+                 </PrivateRoute>,
       },
       {
         path: "/order",
-        element: <Order />,
+        element: <PrivateRoute>
+                  <Order />,
+                 </PrivateRoute>
       },
       {
         path: "/order/new",
-        element: <CreateOrder />,
+        element: <PrivateRoute>
+          <CreateOrder />
+        </PrivateRoute>,
         action: createOrderAction,
       },
       {
         path: "/order/:orderId",
-        element: <Order />,
+        element: <PrivateRoute>
+        <Order />,
+       </PrivateRoute>,
         loader: orderLoader,
+        action: updateOrderAction,
         errorElement: <Error />,
       },
     ],

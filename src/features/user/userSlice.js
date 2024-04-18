@@ -26,6 +26,7 @@ export const fetchAddress = createAsyncThunk("user/fetchAddress", async function
 
 const initialState = {
   username: "",
+  isAuthenticated: false,
   status: "idle",
   position: {},
   address: "",
@@ -38,6 +39,7 @@ const userSlice = createSlice({
   reducers: {
     updateName(state, action) {
       state.username = action.payload;
+      state.isAuthenticated = true;
     }
   },
   extraReducers: (builder) =>
@@ -59,4 +61,5 @@ const userSlice = createSlice({
 
 export const { updateName } = userSlice.actions;
 export const getUsername = state => state.user.username;
+export const getAuthenticationStatus = state => state.user.isAuthenticated;
 export default userSlice.reducer;
