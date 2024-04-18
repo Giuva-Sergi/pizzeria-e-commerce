@@ -3,7 +3,7 @@ import { Form, useActionData, redirect, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../ui/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { getUsername } from "../user/userSlice";
+import { fetchAddress, getUsername } from "../user/userSlice";
 import { getCart, clearCart, getTotalCartPrice } from "../cart/cartSlice";
 import { formatCurrency } from "../../utils/helpers";
 
@@ -36,6 +36,8 @@ function CreateOrder() {
   return (
     <div className="px-4 py-6">
       <h2 className="text-xl font-semibold mb-8">Ready to order? Let&apos;s go!</h2>
+
+      <button onClick={() => dispatch(fetchAddress())}>GET POSITION</button>
 
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -84,7 +86,7 @@ export async function action({ request }) {
   const data = Object.fromEntries(formData);
   const order = {
     ...data,
-    priority: data.priority === "on",
+    priority: data.priority === "true",
     cart: JSON.parse(data.cart),
   };
 
