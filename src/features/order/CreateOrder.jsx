@@ -16,13 +16,14 @@ const isValidPhone = (str) =>
 
 function CreateOrder() {
   const [withPriority, setWithPriority] = useState(false);
-  const username = useSelector(getUsername);
+  const {username, status: addressStatus, position, address, error: errorAddress} = useSelector(state => state.user);
   const cart = useSelector(getCart);
   const totalCartPrice = useSelector(getTotalCartPrice);
   const priorityPrice = withPriority && totalCartPrice * 0.2;
   const totalPrice = totalCartPrice + priorityPrice; 
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const isLoadingPosition = addressStatus === "loading";
   const errors = useActionData();
   const dispatch = useDispatch();
 
@@ -36,8 +37,6 @@ function CreateOrder() {
   return (
     <div className="px-4 py-6">
       <h2 className="text-xl font-semibold mb-8">Ready to order? Let&apos;s go!</h2>
-
-      <button onClick={() => dispatch(fetchAddress())}>GET POSITION</button>
 
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -53,11 +52,22 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center relative">
           <label className="sm:basis-40">Address</label>
           <div className="grow">
-            <input className="input w-full" type="text" name="address" required />
+            <input className="input w-full" type="text" name="address" disabled={isLoadingPosition} defaultValue={address} required />
+            {addressStatus === "error" && <p className="text-xs mt-2 text-red-700 bg-red-100 p-2 rounded-md">{errorAddress}</p>}
           </div>
+          {!address && <span className="absolute right-[3px] top-[3px] md:right-[5px] md:top-[5px] z-10">
+            <Button type="small" handler={(e) => {
+              e.preventDefault();
+              dispatch(fetchAddress());
+              }}
+              disabled={isLoadingPosition}
+              >
+                GET POSITION
+              </Button>
+          </span>}
         </div>
 
         <div className="mb-12 flex gap-5 items-center">
@@ -74,7 +84,8 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <Button type="primary" disabled={isSubmitting}>{isSubmitting ? "Processing order..." : `Order now for ${formatCurrency(totalPrice)}`}</Button>
+          <input type="hidden" name="position" value={position.longitude && position.latitude ? `${position.latitude}, ${position.longitude}` : ""} />
+          <Button type="primary" disabled={isSubmitting || isLoadingPosition}>{isSubmitting ? "Processing order..." : `Order now for ${formatCurrency(totalPrice)}`}</Button>
         </div>
       </Form>
     </div>
@@ -89,6 +100,8 @@ export async function action({ request }) {
     priority: data.priority === "true",
     cart: JSON.parse(data.cart),
   };
+
+  console.log(order);
 
   const errors = {};
 
